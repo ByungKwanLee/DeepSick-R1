@@ -191,9 +191,9 @@ def train(args):
     max_pixels = 512*28*28
     processor = AutoProcessor.from_pretrained(args.model_name, padding_side='left', min_pixels=min_pixels, max_pixels=max_pixels)
 
-    # Uploading Qwen2-2B-VL
-    model = Qwen2VLForConditionalGeneration.from_pretrained(args.model_name, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
-    ref_model = Qwen2VLForConditionalGeneration.from_pretrained(args.model_name, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
+    # Uploading Qwen2.5-VL-3B
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.model_name, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
+    ref_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.model_name, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
     vllm_model, vllm_sampling_params = Utility.load_vLLM(args.model_name,
                                                          accel,
                                                          {'temperature':args.temperature,
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     parser.add_argument('--wandb_id', default="", type=str)
 
     # model name
-    parser.add_argument('--model_name', default="Qwen/Qwen2-VL-2B-Instruct", type=str)
+    parser.add_argument('--model_name', default="Qwen/Qwen2.5-VL-3B-Instruct", type=str)
 
     # Training and Saving CKPT Configuration
     parser.add_argument('--batch_size', default=2, type=int)
