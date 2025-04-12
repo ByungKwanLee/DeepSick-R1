@@ -4,8 +4,8 @@
 
 ## 📰 Breaking News
 
-[x] Qwen2.5-VL has been supported!
-[x] The reason why vLLM is the problem is reported for each version.
+- Qwen2.5-VL has been supported!
+- The reason why vLLM is the problem is reported for each version.
 
 #### 🚑 Why do we need to see this repository although there are many open-source codes for building DeepSeek-R1?
 
