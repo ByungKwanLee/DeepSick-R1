@@ -194,6 +194,9 @@ def train(args):
     # Uploading Qwen2.5-VL-3B
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.model_name, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
     ref_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.model_name, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
+    
+    # vLLM
+    current_device = torch.cuda.current_device()
     vllm_model, vllm_sampling_params = Utility.load_vLLM(args.model_name,
                                                          accel,
                                                          {'temperature':args.temperature,
@@ -202,6 +205,7 @@ def train(args):
                                                           'max_new_tokens': args.max_new_tokens,
                                                           'repetition_penalty': args.repetition_penalty,
                                                           'max_new_tokens': args.max_new_tokens})
+    torch.cuda.set_device(current_device)
 
     # settings
     for name, param in model.named_parameters():
