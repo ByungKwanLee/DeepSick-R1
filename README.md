@@ -36,7 +36,7 @@
 | Version | Debugging Mode (Accelerate + vLLM on Two GPUs) | Flash Attention2 | ZeRO3 Training (Accelerate-DeepSpeed-ZeRO3 + vLLM on Eight GPUs) | Transformer Version | Qwen2.5-VL Error |
 |:-------:|:----------------------------------------------:|:----------------:|:----------------------------------------------------------------:|:-------------------:|:----------------:|
 |  0.7.2  |                        O                       |         O        |                                 O                                |         ~4.49.0         |       Many       |
-|  **0.7.3**  |                        △ (Can solve by manually editing code)                       |         O        |                                 O                                |        Latest       |       Some       |
+|  **0.7.3**  |                        △ (Can solve by manually editing code)                       |         △        |                                 O                                |        Latest       |       Some       |
 |  0.8.0  |                        X                       |         X        |                                 X                                |        Latest       |       Less       |
 |  0.8.1  |                        X                       |         X        |                                 X                                |        Latest       |       Less       |
 |  0.8.2  |                        X                       |         O        |                                 X                                |        Latest       |       Less       |
