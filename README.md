@@ -43,7 +43,7 @@
 |  0.8.3  |                        X                       |         O        |                                 X                                |        Latest       |       Less       |
 
 
-However, in 0.7.3, I modified the main.py code as below. The problem is from the gpu index mapping. To make it work for debugging mode, we should manually edit the code in vLLM. The file is vLLM/worker/worker.py
+However, in 0.7.3, I modified the `vllm/worker/worker.py` (library) code as below. The problem is from the gpu index mapping. To make it work for debugging mode, we should manually edit the code in vLLM.
 ```python
     def init_device(self) -> None:
         if self.device_config.device.type == "cuda":
