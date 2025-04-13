@@ -42,21 +42,41 @@
 |  0.8.2  |                        X                       |         O        |                                 X                                |        Latest       |       Less       |
 |  0.8.3  |                        X                       |         O        |                                 X                                |        Latest       |       Less       |
 
-However, in 0.7.3, I modified the main.py code as below. The problem is from the gpu index mapping.
 
+However, in 0.7.3, I modified the main.py code as below. The problem is from the gpu index mapping. To make it work for debugging mode, we should manually edit the code in vLLM. The file is vLLM/worker/worker.py
 ```python
-    # vLLM
-    current_device = torch.cuda.current_device()
-    vllm_model, vllm_sampling_params = Utility.load_vLLM(args.model_name,
-                                                         accel,
-                                                         {'temperature':args.temperature,
-                                                          'top_p': args.top_p,
-                                                          'top_k': args.top_k,
-                                                          'max_new_tokens': args.max_new_tokens,
-                                                          'repetition_penalty': args.repetition_penalty,
-                                                          'max_new_tokens': args.max_new_tokens})
-    torch.cuda.set_device(current_device)
+    def init_device(self) -> None:
+        if self.device_config.device.type == "cuda":
+            # torch.distributed.all_reduce does not free the input tensor until
+            # the synchronization point. This causes the memory usage to grow
+            # as the number of all_reduce calls increases. This env var disables
+            # this behavior.
+            # Related issue:
+            # https://discuss.pytorch.org/t/cuda-allocation-lifetime-for-inputs-to-distributed-all-reduce/191573
+            os.environ["TORCH_NCCL_AVOID_RECORD_STREAMS"] = "1"
+
+            # This env var set by Ray causes exceptions with graph building.
+            os.environ.pop("NCCL_ASYNC_ERROR_HANDLING", None)
+            self.device = torch.device(f"cuda:{self.local_rank}")
+            # torch.cuda.set_device(self.device) # It is the problem, please comment out
+
+            _check_if_gpu_supports_dtype(self.model_config.dtype)
+            gc.collect()
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats()
+            self.baseline_snapshot = MemorySnapshot()
+        else:
+            raise RuntimeError(
+                f"Not support device type: {self.device_config.device}")
+        # Initialize the distributed environment.
+        init_worker_distributed_environment(self.vllm_config, self.rank,
+                                            self.distributed_init_method,
+                                            self.local_rank)
+        # Set random seed.
+        set_random_seed(self.model_config.seed)
 ```
+
+To use `tensor_parallel_size=8` like that, please use vllm==0.8.3. It is better to use two conda environments for 0.7.3 and 0.8.3.
 
 ---
 
