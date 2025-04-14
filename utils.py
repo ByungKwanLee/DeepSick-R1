@@ -54,6 +54,9 @@ class Utility:
             if 'float32' in str(param.dtype).lower() or 'float16' in str(param.dtype).lower():
                 param.data = param.data.to(torch.bfloat16)
 
+    def repeat(prompt_list, num_gens):
+        return [item for item in prompt_list for _ in range(num_gens)]
+
     def compute_log_probs(model, _inputs, logits_to_keep, temp=0.9, chunk_size=64): 
         # (B, L-1, V), exclude the last logit: it corresponds to the next token pred
         logits = model(**_inputs).logits[:, :-1, :]

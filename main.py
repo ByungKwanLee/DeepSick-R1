@@ -86,14 +86,14 @@ class GRPOTrainer(Trainer):
         output_texts = [p + c for p, c in zip(prompt_list * num_gens, completion_texts)]
         
         # postprocessing for text and image
-        _inputs = processor(text=prompt_list * num_gens, 
-                            images=image_list * num_gens, 
+        _inputs = processor(text=Utility.repeat(prompt_list, num_gens), 
+                            images=Utility.repeat(image_list, num_gens), 
                             padding=True, 
                             return_tensors="pt").to(self.accel.device)
         prompt_length = _inputs.input_ids.shape[1]
 
         # postprocessing for text and image
-        new_prompt_list, new_image_list = Utility.postprocess(inputs * num_gens, processor, qa_index_list * num_gens, completion_texts)
+        new_prompt_list, new_image_list = Utility.postprocess(Utility.repeat(inputs, num_gens), processor, Utility.repeat(qa_index_list, num_gens), completion_texts)
         _new_inputs = processor(text=new_prompt_list, 
                             images=new_image_list, 
                             padding=True,
@@ -112,7 +112,7 @@ class GRPOTrainer(Trainer):
                                          temperature=temperature,
                                          processor=processor,
                                          output_texts=output_texts,
-                                         answers=[i['conversations'][qa_ind]['answer'] for i, qa_ind in zip(inputs, qa_index_list)] * num_gens,
+                                         answers=Utility.repeat([i['conversations'][qa_ind]['answer'] for i, qa_ind in zip(inputs, qa_index_list)] , num_gens),
                                          accel=self.accel)
         rewards = torch.tensor(rewards).float().to(self.accel.device)
         rewards = rewards.view(-1, num_gens, 2)
@@ -273,9 +273,9 @@ if __name__ == "__main__":
     # Generating Answer
     parser.add_argument('--num_gens', default=4, type=int)
     parser.add_argument('--repetition_penalty', default=1.0, type=float)
-    parser.add_argument('--temperature', default=0.01, type=float)
-    parser.add_argument('--top_p', default=0.001, type=float)
-    parser.add_argument('--top_k', default=1, type=int)
+    parser.add_argument('--temperature', default=1, type=float)
+    parser.add_argument('--top_p', default=0.95, type=float)
+    parser.add_argument('--top_k', default=30, type=int)
     parser.add_argument('--max_new_tokens', default=512, type=int)
 
     # GRPO Configuration
